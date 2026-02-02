@@ -55,7 +55,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { records } = body;
+  const { records } = body as { records: Array<{
+    school_id: string;
+    student_id: string;
+    class_id: string;
+    date: string;
+    status: string;
+    notes?: string;
+  }> };
 
   if (!records || !Array.isArray(records) || records.length === 0) {
     return NextResponse.json({ error: 'Records array is required' }, { status: 400 });
@@ -74,7 +81,7 @@ export async function POST(request: NextRequest) {
   // Insert new records
   const { data, error } = await supabase
     .from('attendance_records')
-    .insert(records)
+    .insert(records as any)
     .select();
 
   if (error) {
@@ -105,7 +112,7 @@ export async function PATCH(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('attendance_records')
-    .update(updateData)
+    .update(updateData as any)
     .eq('id', id)
     .select()
     .single();

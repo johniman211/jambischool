@@ -4,6 +4,7 @@ export const config = {
   appName: process.env.NEXT_PUBLIC_APP_NAME || 'Jambi School',
   appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   appMode: (process.env.NEXT_PUBLIC_APP_MODE || 'saas') as AppMode,
+  mode: (process.env.NEXT_PUBLIC_APP_MODE || 'saas') as AppMode,
   
   isSaas: () => config.appMode === 'saas',
   isSelfHosted: () => config.appMode === 'self_hosted',
@@ -167,6 +168,9 @@ export const CURRENCY_CONFIG = {
   USD: { symbol: '$', name: 'US Dollar', locale: 'en-US' },
   SSP: { symbol: 'SSP', name: 'South Sudanese Pound', locale: 'en-SS' },
 } as const;
+
+// Alias for backward compatibility
+export const APP_CONFIG = config;
 
 export function formatCurrency(amount: number, currency: 'USD' | 'SSP' = 'USD'): string {
   const config = CURRENCY_CONFIG[currency];
