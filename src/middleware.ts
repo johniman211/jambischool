@@ -31,6 +31,12 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // If Supabase is not configured, redirect to login for protected routes
+  if (!supabase) {
+    const redirectUrl = new URL('/login', request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // Check if user is authenticated for protected routes
   if (!user && (pathname.startsWith('/app') || pathname.startsWith('/superadmin'))) {
     const redirectUrl = new URL('/login', request.url);
