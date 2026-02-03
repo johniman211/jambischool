@@ -43,10 +43,11 @@ export default function AttendancePage({ params }: AttendancePageProps) {
         .single();
 
       if (school) {
-        const { data } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data } = await (supabase as any)
           .from('classes')
-          .select('id, name, section')
-          .eq('school_id', school.id)
+          .select('id, name, level')
+          .eq('school_id', (school as any).id)
           .order('name');
         
         if (data) setClasses(data);
@@ -75,14 +76,15 @@ export default function AttendancePage({ params }: AttendancePageProps) {
         setStudents(studentData);
 
         // Get existing attendance for this date
-        const { data: attendanceData } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: attendanceData } = await (supabase as any)
           .from('attendance_records')
           .select('student_id, status')
           .eq('class_id', selectedClass)
           .eq('date', selectedDate);
 
         const attendanceMap: Record<string, AttendanceStatus> = {};
-        attendanceData?.forEach(record => {
+        attendanceData?.forEach((record: any) => {
           attendanceMap[record.student_id] = record.status as AttendanceStatus;
         });
         setAttendance(attendanceMap);

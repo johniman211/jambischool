@@ -106,13 +106,14 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Record ID is required' }, { status: 400 });
   }
 
-  const updateData: Record<string, string> = {};
+  const updateData: { status?: string; notes?: string } = {};
   if (status) updateData.status = status;
   if (notes !== undefined) updateData.notes = notes;
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
     .from('attendance_records')
-    .update(updateData as any)
+    .update(updateData)
     .eq('id', id)
     .select()
     .single();

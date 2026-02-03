@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
 
   const receiptNumber = `RCP-${new Date().getFullYear()}-${String((count || 0) + 1).padStart(5, '0')}`;
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
     .from('fee_payments')
     .insert({
       school_id,

@@ -84,7 +84,8 @@ export async function POST(request: NextRequest) {
 
   const invoiceNumber = `INV-${new Date().getFullYear()}-${String((count || 0) + 1).padStart(5, '0')}`;
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
     .from('fee_invoices')
     .insert({
       school_id,
