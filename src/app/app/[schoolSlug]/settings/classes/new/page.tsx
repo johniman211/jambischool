@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,24 +10,65 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Save, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { createClient } from '@/lib/supabase/client';
 
 export default function NewClassPage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     section: '',
     capacity: '',
+    level: '1',
   });
+
+  useEffect(() => {
+    const fetchSchool = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('schools')
+        .select('id')
+        .eq('slug', params.schoolSlug)
+        .single();
+      if (data) setSchoolId(data.id);
+    };
+    fetchSchool();
+  }, [params.schoolSlug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!schoolId) {
+      toast({
+        title: 'Error',
+        description: 'School not found. Please try again.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setLoading(true);
 
     try {
-      // TODO: Implement class creation logic
+      const response = await fetch('/api/classes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          school_id: schoolId,
+          name: formData.name,
+          level: parseInt(formData.level) || 1,
+          description: formData.section || null,
+          capacity: formData.capacity || null,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create class');
+      }
+
       toast({
         title: 'Class created',
         description: 'The class has been successfully created.',
@@ -36,7 +77,7 @@ export default function NewClassPage() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to create class. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to create class. Please try again.',
         variant: 'destructive',
       });
     } finally {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,24 +11,64 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Save, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { createClient } from '@/lib/supabase/client';
 
 export default function NewSubjectPage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     code: '',
     type: '',
   });
 
+  useEffect(() => {
+    const fetchSchool = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('schools')
+        .select('id')
+        .eq('slug', params.schoolSlug)
+        .single();
+      if (data) setSchoolId(data.id);
+    };
+    fetchSchool();
+  }, [params.schoolSlug]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!schoolId) {
+      toast({
+        title: 'Error',
+        description: 'School not found. Please try again.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setLoading(true);
 
     try {
-      // TODO: Implement subject creation logic
+      const response = await fetch('/api/subjects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          school_id: schoolId,
+          name: formData.name,
+          code: formData.code || formData.name.substring(0, 4).toUpperCase(),
+          description: null,
+          is_compulsory: formData.type === 'core',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create subject');
+      }
+
       toast({
         title: 'Subject created',
         description: 'The subject has been successfully created.',
@@ -37,7 +77,7 @@ export default function NewSubjectPage() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to create subject. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to create subject. Please try again.',
         variant: 'destructive',
       });
     } finally {
