@@ -1,13 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, PenLine } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export default function MarksEntryPage() {
+  const params = useParams();
+  const [exams, setExams] = useState<Array<{ id: string; name: string }>>([]);
+  const [classes, setClasses] = useState<Array<{ id: string; name: string }>>([]);
+  const [subjects, setSubjects] = useState<Array<{ id: string; name: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const supabase = createClient();
+      const { data: school } = await supabase
+        .from('schools')
+        .select('id')
+        .eq('slug', params.schoolSlug)
+        .single();
+
+      if (school) {
+        const [examsRes, classesRes, subjectsRes] = await Promise.all([
+          supabase.from('exams').select('id, name').eq('school_id', school.id).order('created_at', { ascending: false }),
+          supabase.from('classes').select('id, name').eq('school_id', school.id).order('name'),
+          supabase.from('subjects').select('id, name').eq('school_id', school.id).order('name'),
+        ]);
+        if (examsRes.data) setExams(examsRes.data);
+        if (classesRes.data) setClasses(classesRes.data);
+        if (subjectsRes.data) setSubjects(subjectsRes.data);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [params.schoolSlug]);
   return (
     <div className="space-y-6">
       <motion.div
@@ -38,7 +69,13 @@ export default function MarksEntryPage() {
                   <SelectValue placeholder="Select Exam" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No exams available</SelectItem>
+                  {exams.length === 0 ? (
+                    <SelectItem value="none">No exams available</SelectItem>
+                  ) : (
+                    exams.map(exam => (
+                      <SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               <Select>
@@ -46,7 +83,13 @@ export default function MarksEntryPage() {
                   <SelectValue placeholder="Select Class" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No classes available</SelectItem>
+                  {classes.length === 0 ? (
+                    <SelectItem value="none">No classes available</SelectItem>
+                  ) : (
+                    classes.map(cls => (
+                      <SelectItem key={cls.id} value={cls.id}>{cls.name}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               <Select>
@@ -54,7 +97,13 @@ export default function MarksEntryPage() {
                   <SelectValue placeholder="Select Subject" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No subjects available</SelectItem>
+                  {subjects.length === 0 ? (
+                    <SelectItem value="none">No subjects available</SelectItem>
+                  ) : (
+                    subjects.map(subject => (
+                      <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
