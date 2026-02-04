@@ -98,9 +98,17 @@ export const PERMISSIONS = {
   BACKUP_DATA: ['super_admin', 'school_admin'],
 } as const;
 
-export function hasPermission(userRole: string, permission: keyof typeof PERMISSIONS): boolean {
-  const allowedRoles = PERMISSIONS[permission];
-  return allowedRoles.includes(userRole as any);
+export function hasPermission(userRole: string, permission: string): boolean {
+  // Check colon-notation permissions first
+  if (permission in ROLE_PERMISSIONS) {
+    return ROLE_PERMISSIONS[permission].includes(userRole);
+  }
+  // Fall back to PERMISSIONS object
+  if (permission in PERMISSIONS) {
+    const allowedRoles = PERMISSIONS[permission as keyof typeof PERMISSIONS];
+    return allowedRoles.includes(userRole as any);
+  }
+  return false;
 }
 
 export function hasMinimumRole(userRole: string, minimumRole: string): boolean {
@@ -168,6 +176,32 @@ export const CURRENCY_CONFIG = {
   USD: { symbol: '$', name: 'US Dollar', locale: 'en-US' },
   SSP: { symbol: 'SSP', name: 'South Sudanese Pound', locale: 'en-SS' },
 } as const;
+
+// Role-based permissions using colon notation
+export const ROLE_PERMISSIONS: Record<string, string[]> = {
+  'students:read': ['super_admin', 'school_admin', 'head_teacher', 'teacher', 'registrar', 'accountant', 'librarian', 'staff'],
+  'students:write': ['super_admin', 'school_admin', 'head_teacher', 'registrar'],
+  'attendance:read': ['super_admin', 'school_admin', 'head_teacher', 'teacher', 'registrar', 'parent', 'student'],
+  'attendance:write': ['super_admin', 'school_admin', 'head_teacher', 'teacher'],
+  'academics:read': ['super_admin', 'school_admin', 'head_teacher', 'teacher', 'registrar', 'parent', 'student'],
+  'academics:write': ['super_admin', 'school_admin', 'head_teacher', 'teacher'],
+  'finance:read': ['super_admin', 'school_admin', 'head_teacher', 'accountant', 'registrar'],
+  'finance:write': ['super_admin', 'school_admin', 'accountant'],
+  'staff:read': ['super_admin', 'school_admin', 'head_teacher', 'registrar'],
+  'staff:write': ['super_admin', 'school_admin'],
+  'timetable:read': ['super_admin', 'school_admin', 'head_teacher', 'teacher', 'registrar', 'staff', 'parent', 'student'],
+  'timetable:write': ['super_admin', 'school_admin', 'head_teacher'],
+  'discipline:read': ['super_admin', 'school_admin', 'head_teacher', 'teacher'],
+  'discipline:write': ['super_admin', 'school_admin', 'head_teacher', 'teacher'],
+  'notifications:read': ['super_admin', 'school_admin', 'head_teacher', 'teacher', 'registrar', 'accountant', 'staff', 'parent', 'student'],
+  'notifications:write': ['super_admin', 'school_admin', 'head_teacher'],
+  'reports:read': ['super_admin', 'school_admin', 'head_teacher', 'accountant', 'registrar'],
+  'reports:write': ['super_admin', 'school_admin'],
+  'settings:read': ['super_admin', 'school_admin', 'head_teacher'],
+  'settings:write': ['super_admin', 'school_admin'],
+};
+
+export type UserRole = 'super_admin' | 'school_admin' | 'head_teacher' | 'teacher' | 'registrar' | 'accountant' | 'librarian' | 'staff' | 'parent' | 'student';
 
 // Alias for backward compatibility
 export const APP_CONFIG = config;
