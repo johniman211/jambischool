@@ -14,8 +14,11 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function InvoicesPage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   const stats = [
@@ -36,9 +39,11 @@ export default function InvoicesPage() {
           <h1 className="text-3xl font-bold">Invoices</h1>
           <p className="text-muted-foreground">Create and manage student fee invoices</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Create Invoice
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/fees/invoices/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Create Invoice
+          </Button>
+        </Link>
       </motion.div>
 
       <motion.div
@@ -94,9 +99,11 @@ export default function InvoicesPage() {
               <p className="text-muted-foreground mb-4">
                 Create fee structures first, then generate invoices for students
               </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" /> Create First Invoice
-              </Button>
+              <Link href={`/app/${params.schoolSlug}/fees/invoices/new`}>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" /> Create First Invoice
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

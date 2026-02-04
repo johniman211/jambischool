@@ -14,8 +14,11 @@ import {
   Calendar,
   Receipt
 } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function PaymentsPage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   const stats = [
@@ -36,9 +39,11 @@ export default function PaymentsPage() {
           <h1 className="text-3xl font-bold">Payments</h1>
           <p className="text-muted-foreground">Record and track fee payments</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Record Payment
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/fees/payments/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Record Payment
+          </Button>
+        </Link>
       </motion.div>
 
       <motion.div
@@ -94,9 +99,11 @@ export default function PaymentsPage() {
               <p className="text-muted-foreground mb-4">
                 Record your first payment to start tracking collections
               </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" /> Record First Payment
-              </Button>
+              <Link href={`/app/${params.schoolSlug}/fees/payments/new`}>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" /> Record First Payment
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

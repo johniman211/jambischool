@@ -13,8 +13,11 @@ import {
   GraduationCap,
   Settings
 } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function FeeStructuresPage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -28,9 +31,11 @@ export default function FeeStructuresPage() {
           <h1 className="text-3xl font-bold">Fee Structures</h1>
           <p className="text-muted-foreground">Define fee categories and amounts for each class</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Add Fee Structure
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/fees/structures/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Add Fee Structure
+          </Button>
+        </Link>
       </motion.div>
 
       <motion.div
@@ -110,9 +115,11 @@ export default function FeeStructuresPage() {
               <p className="text-muted-foreground mb-4">
                 Create fee structures to define tuition, boarding, and other fees
               </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" /> Create Fee Structure
-              </Button>
+              <Link href={`/app/${params.schoolSlug}/fees/structures/new`}>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" /> Create Fee Structure
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

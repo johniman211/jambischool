@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar, Plus, Search, BookOpen } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function ExamsPage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -21,9 +24,11 @@ export default function ExamsPage() {
           <h1 className="text-3xl font-bold">Examinations</h1>
           <p className="text-muted-foreground">Schedule and manage exams</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Schedule Exam
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/academics/exams/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Schedule Exam
+          </Button>
+        </Link>
       </motion.div>
 
       <Card>
@@ -51,9 +56,11 @@ export default function ExamsPage() {
             <p className="text-muted-foreground mb-4">
               Schedule your first exam to start tracking academic performance
             </p>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" /> Schedule First Exam
-            </Button>
+            <Link href={`/app/${params.schoolSlug}/academics/exams/new`}>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" /> Schedule First Exam
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

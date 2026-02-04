@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, FileText, Award, Plus, Calendar } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function AcademicsPage() {
+  const params = useParams();
   const [activeTab, setActiveTab] = useState('exams');
 
   return (
@@ -21,9 +24,11 @@ export default function AcademicsPage() {
           <h1 className="text-3xl font-bold">Academics</h1>
           <p className="text-muted-foreground">Manage exams, marks, and report cards</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Create Exam
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/academics/exams/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Create Exam
+          </Button>
+        </Link>
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -59,9 +64,11 @@ export default function AcademicsPage() {
                   <p className="text-muted-foreground mb-4">
                     Create your first exam to start tracking academic performance
                   </p>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" /> Schedule Exam
-                  </Button>
+                  <Link href={`/app/${params.schoolSlug}/academics/exams/new`}>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" /> Schedule Exam
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

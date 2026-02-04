@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FileText, Plus, Search, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function DisciplinePage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   const stats = [
@@ -28,9 +31,11 @@ export default function DisciplinePage() {
           <h1 className="text-3xl font-bold">Discipline Records</h1>
           <p className="text-muted-foreground">Track and manage student behavior and incidents</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> New Record
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/discipline/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> New Record
+          </Button>
+        </Link>
       </motion.div>
 
       <motion.div
@@ -86,9 +91,11 @@ export default function DisciplinePage() {
               <p className="text-muted-foreground mb-4">
                 No discipline records have been created yet
               </p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" /> Create First Record
-              </Button>
+              <Link href={`/app/${params.schoolSlug}/discipline/new`}>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" /> Create First Record
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

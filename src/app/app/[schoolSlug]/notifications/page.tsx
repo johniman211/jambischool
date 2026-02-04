@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bell, Send, Inbox, CheckCheck, Plus, Mail, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function NotificationsPage() {
+  const params = useParams();
   const [activeTab, setActiveTab] = useState('inbox');
 
   return (
@@ -21,9 +24,11 @@ export default function NotificationsPage() {
           <h1 className="text-3xl font-bold">Notifications</h1>
           <p className="text-muted-foreground">Manage communications and announcements</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> New Notification
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/notifications/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> New Notification
+          </Button>
+        </Link>
       </motion.div>
 
       <motion.div
@@ -106,9 +111,11 @@ export default function NotificationsPage() {
                   <p className="text-muted-foreground mb-4">
                     Send your first notification to parents or staff
                   </p>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" /> Create Notification
-                  </Button>
+                  <Link href={`/app/${params.schoolSlug}/notifications/new`}>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" /> Create Notification
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
