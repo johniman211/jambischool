@@ -35,9 +35,9 @@ export default function SchoolNotFoundPage() {
               This could happen if the school was deleted, the URL is incorrect, or your access was revoked.
             </p>
             <div className="flex flex-col gap-2">
-              <Link href="/app">
+              <Link href="/app/no-school">
                 <Button className="w-full gap-2">
-                  <Home className="h-4 w-4" /> Go to Dashboard
+                  <Home className="h-4 w-4" /> Create a School
                 </Button>
               </Link>
               <Link href="/">
