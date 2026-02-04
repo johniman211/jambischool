@@ -20,8 +20,7 @@ export async function GET(request: NextRequest) {
     .from('students')
     .select(`
       *,
-      current_class:classes(id, name, section),
-      guardian:guardians(id, full_name, phone)
+      enrollments(id, class_id, classes(id, name))
     `, { count: 'exact' })
     .eq('school_id', schoolId);
 

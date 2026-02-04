@@ -41,8 +41,8 @@ export default async function StudentsPage({ params, searchParams }: StudentsPag
     .from('students')
     .select(`
       *,
-      current_class:classes(id, name, section),
-      guardian:guardians(id, full_name, phone, relationship)
+      enrollments(id, class_id, classes(id, name)),
+      guardians(id, first_name, last_name, phone, relationship)
     `, { count: 'exact' })
     .eq('school_id', school.id)
     .order('created_at', { ascending: false })
@@ -163,17 +163,17 @@ export default async function StudentsPage({ params, searchParams }: StudentsPag
                     </Link>
                   </TableCell>
                   <TableCell>
-                    {student.current_class ? (
-                      <span>{student.current_class.name} {student.current_class.section}</span>
+                    {student.enrollments?.[0]?.classes ? (
+                      <span>{student.enrollments[0].classes.name}</span>
                     ) : (
                       <span className="text-muted-foreground">Not assigned</span>
                     )}
                   </TableCell>
                   <TableCell>
-                    {student.guardian ? (
+                    {student.guardians?.[0] ? (
                       <div>
-                        <p className="text-sm">{student.guardian.full_name}</p>
-                        <p className="text-xs text-muted-foreground">{student.guardian.phone}</p>
+                        <p className="text-sm">{student.guardians[0].first_name} {student.guardians[0].last_name}</p>
+                        <p className="text-xs text-muted-foreground">{student.guardians[0].phone}</p>
                       </div>
                     ) : (
                       <span className="text-muted-foreground">-</span>

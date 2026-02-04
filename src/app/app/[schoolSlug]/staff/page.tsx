@@ -32,13 +32,14 @@ export default async function StaffPage({ params }: StaffPageProps) {
 
   // Get staff members with their memberships
   const { data: memberships } = await supabase
-    .from('memberships')
+    .from('school_memberships')
     .select(`
       id,
       role,
       is_active,
       created_at,
-      profile:profiles(id, full_name, email, phone, avatar_url)
+      user_id,
+      profiles(id, full_name, email, phone, avatar_url)
     `)
     .eq('school_id', school.id)
     .neq('role', 'parent')
@@ -46,7 +47,7 @@ export default async function StaffPage({ params }: StaffPageProps) {
 
   // Get staff by role counts
   const roleCounts = {
-    admin: memberships?.filter(m => m.role === 'admin').length || 0,
+    admin: memberships?.filter(m => m.role === 'school_admin' || m.role === 'head_teacher').length || 0,
     teacher: memberships?.filter(m => m.role === 'teacher').length || 0,
     accountant: memberships?.filter(m => m.role === 'accountant').length || 0,
     total: memberships?.length || 0,
@@ -54,9 +55,11 @@ export default async function StaffPage({ params }: StaffPageProps) {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-purple-100 text-purple-800';
+      case 'school_admin': 
+      case 'head_teacher': return 'bg-purple-100 text-purple-800';
       case 'teacher': return 'bg-blue-100 text-blue-800';
       case 'accountant': return 'bg-green-100 text-green-800';
+      case 'registrar': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -141,18 +144,18 @@ export default async function StaffPage({ params }: StaffPageProps) {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium">
-                          {member.profile?.full_name?.charAt(0) || '?'}
+                          {member.profiles?.full_name?.charAt(0) || '?'}
                         </div>
                         <div>
-                          <p className="font-medium">{member.profile?.full_name || 'Unknown'}</p>
+                          <p className="font-medium">{member.profiles?.full_name || 'Unknown'}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{member.profile?.email || '-'}</TableCell>
-                    <TableCell>{member.profile?.phone || '-'}</TableCell>
+                    <TableCell>{member.profiles?.email || '-'}</TableCell>
+                    <TableCell>{member.profiles?.phone || '-'}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getRoleBadgeColor(member.role)}`}>
-                        {member.role}
+                        {member.role?.replace('_', ' ')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -161,7 +164,7 @@ export default async function StaffPage({ params }: StaffPageProps) {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/app/${params.schoolSlug}/staff/${member.profile?.id}`}>
+                      <Link href={`/app/${params.schoolSlug}/staff/${member.user_id}`}>
                         <Button variant="ghost" size="sm">View</Button>
                       </Link>
                     </TableCell>

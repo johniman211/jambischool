@@ -57,7 +57,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   // Get recent fee collection
   const { data: recentPayments } = await supabase
-    .from('fee_payments')
+    .from('payments')
     .select('amount')
     .eq('school_id', school.id)
     .gte('payment_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);

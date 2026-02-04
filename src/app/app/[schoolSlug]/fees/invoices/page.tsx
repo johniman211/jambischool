@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { 
   FileText, 
   Plus, 
@@ -16,16 +17,77 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+
+interface Invoice {
+  id: string;
+  invoice_number: string;
+  student_id: string;
+  total: number;
+  balance: number;
+  status: string;
+  due_date: string;
+  created_at: string;
+  students?: { first_name: string; last_name: string; admission_number: string };
+}
 
 export default function InvoicesPage() {
   const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    paid: 0,
+    pending: 0,
+    overdue: 0,
+  });
 
-  const stats = [
-    { label: 'Total Invoices', value: '0', icon: FileText, color: 'text-blue-500', bg: 'bg-blue-100' },
-    { label: 'Paid', value: '$0', icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-100' },
-    { label: 'Pending', value: '$0', icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-100' },
-    { label: 'Overdue', value: '$0', icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-100' },
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      const supabase = createClient();
+      const { data: school } = await supabase
+        .from('schools')
+        .select('id')
+        .eq('slug', params.schoolSlug)
+        .single();
+
+      if (school) {
+        const { data } = await supabase
+          .from('invoices')
+          .select('*, students(first_name, last_name, admission_number)')
+          .eq('school_id', school.id)
+          .order('created_at', { ascending: false });
+
+        if (data) {
+          setInvoices(data as Invoice[]);
+          const paid = data.filter(i => i.status === 'paid').reduce((sum, i) => sum + Number(i.total), 0);
+          const pending = data.filter(i => i.status === 'pending' || i.status === 'partial').reduce((sum, i) => sum + Number(i.balance), 0);
+          const overdue = data.filter(i => i.status === 'overdue').reduce((sum, i) => sum + Number(i.balance), 0);
+          setStats({
+            total: data.length,
+            paid,
+            pending,
+            overdue,
+          });
+        }
+      }
+      setLoading(false);
+    };
+    fetchInvoices();
+  }, [params.schoolSlug]);
+
+  const filteredInvoices = invoices.filter(inv => 
+    inv.invoice_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    inv.students?.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    inv.students?.last_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const statCards = [
+    { label: 'Total Invoices', value: stats.total.toString(), icon: FileText, color: 'text-blue-500', bg: 'bg-blue-100' },
+    { label: 'Paid', value: `$${stats.paid.toLocaleString()}`, icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-100' },
+    { label: 'Pending', value: `$${stats.pending.toLocaleString()}`, icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-100' },
+    { label: 'Overdue', value: `$${stats.overdue.toLocaleString()}`, icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-100' },
   ];
 
   return (
@@ -52,7 +114,7 @@ export default function InvoicesPage() {
         transition={{ delay: 0.1 }}
         className="grid gap-4 md:grid-cols-4"
       >
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <Card key={stat.label}>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -93,18 +155,41 @@ export default function InvoicesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12">
-              <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">No Invoices Created</h3>
-              <p className="text-muted-foreground mb-4">
-                Create fee structures first, then generate invoices for students
-              </p>
-              <Link href={`/app/${params.schoolSlug}/fees/invoices/new`}>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" /> Create First Invoice
-                </Button>
-              </Link>
-            </div>
+            {loading ? (
+              <div className="text-center py-12">Loading...</div>
+            ) : filteredInvoices.length === 0 ? (
+              <div className="text-center py-12">
+                <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Invoices Created</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create fee structures first, then generate invoices for students
+                </p>
+                <Link href={`/app/${params.schoolSlug}/fees/invoices/new`}>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" /> Create First Invoice
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredInvoices.map((invoice) => (
+                  <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{invoice.invoice_number}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {invoice.students?.first_name} {invoice.students?.last_name}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold">${Number(invoice.total).toLocaleString()}</p>
+                      <Badge variant={invoice.status === 'paid' ? 'default' : invoice.status === 'overdue' ? 'destructive' : 'secondary'}>
+                        {invoice.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
