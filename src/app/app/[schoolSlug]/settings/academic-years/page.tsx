@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar, Plus, Search } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function AcademicYearsPage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -21,9 +24,11 @@ export default function AcademicYearsPage() {
           <h1 className="text-3xl font-bold">Academic Years</h1>
           <p className="text-muted-foreground">Manage academic years and terms</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Add Academic Year
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/settings/academic-years/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Add Academic Year
+          </Button>
+        </Link>
       </motion.div>
 
       <Card>
@@ -51,9 +56,11 @@ export default function AcademicYearsPage() {
             <p className="text-muted-foreground mb-4">
               Create your first academic year to get started
             </p>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" /> Create Academic Year
-            </Button>
+            <Link href={`/app/${params.schoolSlug}/settings/academic-years/new`}>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" /> Create Academic Year
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

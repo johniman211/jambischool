@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BookOpen, Plus, Search } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function SubjectsPage() {
+  const params = useParams();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -21,9 +24,11 @@ export default function SubjectsPage() {
           <h1 className="text-3xl font-bold">Subjects</h1>
           <p className="text-muted-foreground">Manage subjects taught in your school</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" /> Add Subject
-        </Button>
+        <Link href={`/app/${params.schoolSlug}/settings/subjects/new`}>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" /> Add Subject
+          </Button>
+        </Link>
       </motion.div>
 
       <Card>
@@ -51,9 +56,11 @@ export default function SubjectsPage() {
             <p className="text-muted-foreground mb-4">
               Add subjects like Mathematics, English, Science, etc.
             </p>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" /> Create First Subject
-            </Button>
+            <Link href={`/app/${params.schoolSlug}/settings/subjects/new`}>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" /> Create First Subject
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
