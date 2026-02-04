@@ -61,12 +61,17 @@ export default function NewStudentPage({ params }: NewStudentPageProps) {
         throw new Error('School not found');
       }
 
-      // Create guardian first
+      // Create guardian first - split name into first_name and last_name
+      const nameParts = formData.guardian_name.trim().split(' ');
+      const guardianFirstName = nameParts[0] || '';
+      const guardianLastName = nameParts.slice(1).join(' ') || '';
+
       const { data: guardian, error: guardianError } = await supabase
         .from('guardians')
         .insert({
           school_id: school.id,
-          full_name: formData.guardian_name,
+          first_name: guardianFirstName,
+          last_name: guardianLastName,
           phone: formData.guardian_phone,
           email: formData.guardian_email || null,
           relationship: formData.guardian_relationship,

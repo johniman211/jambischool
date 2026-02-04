@@ -174,7 +174,7 @@ export default async function StudentDetailPage({ params }: StudentDetailPagePro
               <CardContent className="space-y-4">
                 {student.guardian ? (
                   <>
-                    <InfoRow label="Name" value={student.guardian.full_name} />
+                    <InfoRow label="Name" value={`${student.guardian.first_name || ''} ${student.guardian.last_name || ''}`.trim() || '-'} />
                     <InfoRow label="Relationship" value={student.guardian.relationship} />
                     <InfoRow label="Phone" value={student.guardian.phone} />
                     <InfoRow label="Email" value={student.guardian.email || '-'} />
