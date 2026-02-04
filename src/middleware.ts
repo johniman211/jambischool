@@ -59,6 +59,12 @@ export async function middleware(request: NextRequest) {
 
   // SaaS mode: require school slug in URL
   if (appConfig.isSaas() && pathname.startsWith('/app/')) {
+    // Allow special app pages without school context
+    const noSchoolPages = ['/app/no-school', '/app/school-not-found', '/app/access-denied'];
+    if (noSchoolPages.some(page => pathname.startsWith(page))) {
+      return response;
+    }
+
     const pathParts = pathname.split('/');
     const schoolSlug = pathParts[2];
 
