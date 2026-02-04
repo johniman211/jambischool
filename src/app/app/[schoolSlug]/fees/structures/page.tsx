@@ -1,0 +1,122 @@
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  Layers, 
+  Plus, 
+  Search, 
+  DollarSign,
+  GraduationCap,
+  Settings
+} from 'lucide-react';
+
+export default function FeeStructuresPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  return (
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <div>
+          <h1 className="text-3xl font-bold">Fee Structures</h1>
+          <p className="text-muted-foreground">Define fee categories and amounts for each class</p>
+        </div>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" /> Add Fee Structure
+        </Button>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="grid gap-4 md:grid-cols-3"
+      >
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-blue-100 text-blue-500">
+                <Layers className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">0</p>
+                <p className="text-sm text-muted-foreground">Fee Categories</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-green-100 text-green-500">
+                <GraduationCap className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">0</p>
+                <p className="text-sm text-muted-foreground">Classes Configured</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-purple-100 text-purple-500">
+                <DollarSign className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">$0</p>
+                <p className="text-sm text-muted-foreground">Avg. Annual Fee</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Fee Structures by Class</CardTitle>
+                <CardDescription>Configure fees for each class and term</CardDescription>
+              </div>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search structures..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-12">
+              <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">No Fee Structures Defined</h3>
+              <p className="text-muted-foreground mb-4">
+                Create fee structures to define tuition, boarding, and other fees
+              </p>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" /> Create Fee Structure
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}

@@ -1,0 +1,62 @@
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Calendar, Plus, Search, BookOpen } from 'lucide-react';
+
+export default function ExamsPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  return (
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <div>
+          <h1 className="text-3xl font-bold">Examinations</h1>
+          <p className="text-muted-foreground">Schedule and manage exams</p>
+        </div>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" /> Schedule Exam
+        </Button>
+      </motion.div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>All Exams</CardTitle>
+              <CardDescription>View scheduled examinations</CardDescription>
+            </div>
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search exams..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12">
+            <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">No Exams Scheduled</h3>
+            <p className="text-muted-foreground mb-4">
+              Schedule your first exam to start tracking academic performance
+            </p>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" /> Schedule First Exam
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
